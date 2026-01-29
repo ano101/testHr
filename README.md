@@ -26,6 +26,10 @@ cd testHr
 cp .env.example .env
 ```
 
+Поправить в .env (если надо)
+WWWGROUP=1000
+WWWUSER=1000
+
 ```bash
 docker compose up -d
 ```
@@ -77,6 +81,8 @@ php artisan meilisearch:setup
 ```
 
 ### 9. Запустить сборку фронтенда
+
+Перезагрузить контейнер
 
 Для разработки:
 
