@@ -3,26 +3,42 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required','email'],
-            'password' => ['required'],
-        ]);
+        $credentials = $request->validated();
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+        if (! Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Неверный email или пароль'], 401);
         }
 
-        $token = $request->user()->createToken('api-token')->plainTextToken;
+        $user = $request->user();
+        $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'token' => $token
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ]);
+    }
+
+    public function me()
+    {
+        $user = auth()->user();
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
         ]);
     }
 }

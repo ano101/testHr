@@ -5,48 +5,39 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Создаём тестового пользователя
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin',
+            'email' => 'admin@test.ru',
             'password' => bcrypt('password'),
         ]);
 
-        // Создаём категории
         $categories = [
-            ['name' => 'Электроника', 'description' => 'Электронные устройства и гаджеты'],
-            ['name' => 'Одежда', 'description' => 'Одежда и аксессуары'],
-            ['name' => 'Книги', 'description' => 'Печатные и электронные книги'],
-            ['name' => 'Спорт', 'description' => 'Спортивные товары и оборудование'],
-            ['name' => 'Продукты', 'description' => 'Продукты питания'],
+            ['name' => 'Электроника', 'description' => 'Смартфоны, ноутбуки и другая техника'],
+            ['name' => 'Одежда', 'description' => 'Мужская и женская одежда'],
+            ['name' => 'Книги', 'description' => 'Художественная и техническая литература'],
+            ['name' => 'Спорттовары', 'description' => 'Всё для занятий спортом'],
+            ['name' => 'Продукты', 'description' => 'Продукты питания и напитки'],
         ];
 
-        foreach ($categories as $categoryData) {
-            $category = Category::create($categoryData);
+        foreach ($categories as $data) {
+            $cat = Category::create($data);
 
-            // Создаём 5 товаров для каждой категории
             for ($i = 1; $i <= 5; $i++) {
                 Product::create([
-                    'name' => "{$category->name} - Товар {$i}",
-                    'description' => "Описание товара {$i} в категории {$category->name}",
-                    'price' => rand(100, 10000) / 10, // случайная цена от 10 до 1000
-                    'category_id' => $category->id,
+                    'name' => $cat->name.' товар №'.$i,
+                    'description' => 'Подробное описание товара '.$i.' из категории '.$cat->name,
+                    'price' => rand(100, 10000) / 10,
+                    'category_id' => $cat->id,
                 ]);
             }
         }
 
-        $this->command->info('Создано ' . Category::count() . ' категорий и ' . Product::count() . ' товаров.');
+        $this->command->info('Готово! Создано '.Category::count().' категорий и '.Product::count().' товаров');
     }
 }

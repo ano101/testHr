@@ -5,17 +5,13 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// Аутентификация
 Route::post('/login', [AuthController::class, 'login']);
 
-// Публичные эндпоинты (GET должны быть публичными)
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index']);
+Route::apiResource('categories', CategoryController::class)->only(['index']);
 
-// Защищённые эндпоинты (требуется аутентификация)
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::apiResource('products', ProductController::class)->except(['index', 'show']);
 });

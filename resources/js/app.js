@@ -1,6 +1,17 @@
 import './bootstrap';
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
+
+router.on('before', (event) => {
+    const token = localStorage.getItem('auth_token');
+
+    if (token) {
+        event.detail.visit.headers = {
+            ...event.detail.visit.headers,
+            'Authorization': `Bearer ${token}`,
+        };
+    }
+});
 
 createInertiaApp({
     resolve: name => {
@@ -13,4 +24,3 @@ createInertiaApp({
             .mount(el)
     },
 })
-
