@@ -64,16 +64,16 @@ npm install
 php artisan migrate
 ```
 
-### 8. Настроить Meilisearch и загрузить данные
-
-```bash
-php artisan meilisearch:setup
-```
-
-Или запустите обычные сидеры:
+### 8. Загрузить данные и астроить Meilisearch
 
 ```bash
 php artisan db:seed
+```
+
+настройка индекса и импорт:
+
+```bash
+php artisan meilisearch:setup
 ```
 
 ### 9. Запустить сборку фронтенда
