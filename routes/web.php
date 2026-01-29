@@ -10,7 +10,6 @@ Route::get('/search', [ProductPageController::class, 'search'])->name('products.
 Route::get('/products/{product}', [ProductPageController::class, 'show'])->name('products.show');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
