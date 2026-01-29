@@ -20,6 +20,12 @@ cd testHr
 
 ### 2. Запустить Docker контейнеры
 
+Скопируйте `.env.example` в `.env` и настройте параметры:
+
+```bash
+cp .env.example .env
+```
+
 ```bash
 docker compose up -d
 ```
@@ -39,12 +45,6 @@ composer install
 ```
 
 ### 5. Настроить файл окружения
-
-Скопируйте `.env.example` в `.env` и настройте параметры:
-
-```bash
-cp .env.example .env
-```
 
 Сгенерируйте ключ приложения:
 
