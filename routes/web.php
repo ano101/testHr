@@ -12,7 +12,7 @@ Route::get('/products/{product}', [ProductPageController::class, 'show'])->name(
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->middleware(['auth.check'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');

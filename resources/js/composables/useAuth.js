@@ -1,89 +1,64 @@
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const token = ref(localStorage.getItem('auth_token') || null);
-const user = ref(JSON.parse(localStorage.getItem('auth_user') || 'null'));
+const user = ref(null);
 
 export function useAuth() {
     const isAuthenticated = computed(() => !!token.value);
 
     const login = async (email, password) => {
         try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const response = await axios.post('/api/login', { email, password });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Ошибка входа');
-            }
+            token.value = response.data.token;
+            user.value = response.data.user;
 
-            const data = await response.json();
-
-            token.value = data.token;
-            user.value = data.user;
-
-            localStorage.setItem('auth_token', data.token);
-            localStorage.setItem('auth_user', JSON.stringify(data.user));
+            // Сохраняем только токен, юзер будет загружаться при необходимости
+            localStorage.setItem('auth_token', response.data.token);
 
             return { success: true };
         } catch (error) {
-            return { success: false, error: error.message };
+            const message = error.response?.data?.message || 'Ошибка входа';
+            return { success: false, error: message };
         }
     };
 
-    const logout = () => {
-        token.value = null;
-        user.value = null;
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
+    const logout = async () => {
+        try {
+            // Удаляем токен на бэкенде через API
+            if (token.value) {
+                await axios.post('/api/logout');
+            }
+        } catch (error) {
+            console.error('Ошибка при logout:', error);
+        } finally {
+            // Очищаем локальное состояние
+            token.value = null;
+            user.value = null;
+            localStorage.removeItem('auth_token');
 
-        router.post('/logout');
-    };
-
-    const getAuthHeaders = () => {
-        return {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token.value}`,
-        };
+            // Редирект на главную
+            router.visit('/');
+        }
     };
 
     const checkAuth = async () => {
         if (!token.value) {
+            user.value = null;
             return false;
         }
 
         try {
-            const response = await fetch('/api/me', {
-                method: 'GET',
-                headers: getAuthHeaders(),
-            });
-
-            if (!response.ok) {
-                // Токен невалидный, очищаем данные
-                token.value = null;
-                user.value = null;
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_user');
-                return false;
-            }
-
-            const data = await response.json();
-            user.value = data.user;
-            localStorage.setItem('auth_user', JSON.stringify(data.user));
+            const response = await axios.get('/api/me');
+            user.value = response.data.user;
             return true;
         } catch (error) {
-            // При ошибке очищаем данные
+            // Токен невалидный, очищаем
             token.value = null;
             user.value = null;
             localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
             return false;
         }
     };
@@ -94,7 +69,6 @@ export function useAuth() {
         isAuthenticated,
         login,
         logout,
-        getAuthHeaders,
         checkAuth,
     };
 }

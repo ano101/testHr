@@ -41,4 +41,12 @@ class AuthController extends Controller
             ],
         ]);
     }
+
+    public function logout()
+    {
+        // Удаляем текущий токен пользователя
+        auth()->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Успешный выход']);
+    }
 }

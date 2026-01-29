@@ -1,8 +1,15 @@
 <script setup>
+import { onMounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { useAuth } from '@/composables/useAuth';
+import { requireAuth } from '@/utils/authGuard';
 
 const { user, logout } = useAuth();
+
+// Проверяем авторизацию при загрузке админки
+onMounted(async () => {
+    await requireAuth();
+});
 
 const isActive = (path) => {
     return window.location.pathname.startsWith(path);

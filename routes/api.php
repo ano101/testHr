@@ -13,5 +13,6 @@ Route::apiResource('products', ProductController::class)->only(['index', 'show']
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('products', ProductController::class)->except(['index', 'show']);
 });

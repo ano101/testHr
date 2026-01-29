@@ -1,66 +1,48 @@
 import { ref, reactive } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { useAuth } from '@/composables/useAuth';
+import axios from 'axios';
 
 export function useProductApi() {
-    const { getAuthHeaders } = useAuth();
-
     /**
      * Создание нового продукта
      */
     const createProduct = async (formData) => {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(formData),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
+        try {
+            const response = await axios.post('/api/products', formData);
+            return response.data;
+        } catch (error) {
             throw {
-                errors: errorData.errors || null,
-                message: errorData.message || 'Ошибка при создании товара',
+                errors: error.response?.data?.errors || null,
+                message: error.response?.data?.message || 'Ошибка при создании товара',
             };
         }
-
-        return await response.json();
     };
 
     /**
      * Обновление существующего продукта
      */
     const updateProduct = async (productId, formData) => {
-        const response = await fetch(`/api/products/${productId}`, {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(formData),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
+        try {
+            const response = await axios.put(`/api/products/${productId}`, formData);
+            return response.data;
+        } catch (error) {
             throw {
-                errors: errorData.errors || null,
-                message: errorData.message || 'Ошибка при обновлении товара',
+                errors: error.response?.data?.errors || null,
+                message: error.response?.data?.message || 'Ошибка при обновлении товара',
             };
         }
-
-        return await response.json();
     };
 
     /**
      * Удаление продукта
      */
     const deleteProduct = async (productId) => {
-        const response = await fetch(`/api/products/${productId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders(),
-        });
-
-        if (!response.ok) {
-            throw new Error('Ошибка при удалении товара');
+        try {
+            await axios.delete(`/api/products/${productId}`);
+            return true;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Ошибка при удалении товара');
         }
-
-        return true;
     };
 
     return {
